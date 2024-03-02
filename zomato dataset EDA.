@@ -1,0 +1,76 @@
+# Zomato Dataset Exploratory Data Analysis
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+df = pd.read_csv('zomato.csv',encoding='latin-1')
+df.head()
+df.columns
+df.info()
+df.describe()
+Missing Values
+df.isnull().sum()
+sns.heatmap(df.isnull(),yticklabels=False, cbar=False, cmap='viridis')
+df_country = pd.read_excel('Country-Code.xlsx')
+df_country
+new_df = pd.merge(df,df_country,on='Country Code', how='left')
+new_df.head()
+new_df.dtypes
+country_names = new_df.value_counts('Country').index
+country_val = new_df.value_counts('Country').values
+plt.pie(country_val[:4],labels=country_names[:4], autopct='%1.2f%%')
+plt.show()
+Observation: Zomato maximum records or transations are from India after that USA and UK.
+new_df.columns
+ratings = new_df.groupby(['Aggregate rating','Rating color', 'Rating text',]).size().reset_index().rename(columns={0:'Raing_Count'})
+ratings
+## Observation
+1. When Rating is between 4.5 to 4.9---> Excellent
+2. When Rating is between 4.0 to 3.4---> Very good
+3. Wnen rating is between 3.5 to 3.9---> Good
+4. When Rating is between 3.0 to 3.4---> Average
+5. When Rating is between 2.5 to 2.9---> Average
+6. When Rating is between 2.0 to 2.4---> Poor
+plt.rcParams['figure.figsize'] = (12,6)
+sns.barplot(x='Aggregate rating', y='Raing_Count', data=ratings)
+sns.barplot(x='Aggregate rating', y='Raing_Count',hue='Rating color', data=ratings,palette=['blue','red','orange','yellow','green','darkgreen'])
+## Count Plot
+sns. countplot(x='Rating color',data=ratings,palette=['blue','red','orange','yellow','green','darkgreen'])
+Countries with zero ratings.
+new_df[new_df['Rating color']=='White'].groupby('Country').size().reset_index()
+new_df.groupby(['Aggregate rating','Country']).size().reset_index().head(5)
+Observations: Maximum numbers of 0 ratings are from Indian customers
+new_df.columns
+Currency used by country...
+new_df[['Country','Currency']].groupby(['Country','Currency']).size().reset_index()
+new_df[new_df['Has Online delivery'] == 'Yes'].Country.value_counts()
+new_df[['Has Online delivery', 'Country']].groupby(['Has Online delivery','Country']).size().reset_index()
+Observations:
+1. Online Deliveries are available in India and UAE
+City_values = new_df.City.value_counts().values
+City_labels = new_df.City.value_counts().index
+plt.pie(City_values[:5],labels=City_labels[:5],autopct='%1.2f%%')
+Top 5 City distributions. New Delhi has maximum transactions.
+new_df.columns
+cus_values = new_df['Cuisines'].value_counts().values
+cus_labels = new_df['Cuisines'].value_counts().index
+plt.pie(cus_values[:10],labels=cus_labels[:10],autopct='%1.2f%%')
+# With respect to Aggregate ratings
+new_df[['Aggregate rating','Cuisines']].groupby(['Aggregate rating','Cuisines']).size().reset_index().tail(10)
+Final Observations 
+
+1. Geographical Trends:
+
+Led analysis highlighting India as the primary contributor, followed by the USA and the UK.
+Rating Patterns:
+
+Identified predominant "Excellent" and "Very Good" ratings, emphasizing positive user experiences.
+2. Zero Ratings Analysis:
+
+Investigated and found a concentration of zero ratings in India, suggesting potential areas for improvement.
+3. Online Delivery Insights:
+
+Highlighted the availability of online delivery services in India and the UAE.
+4. City and Cuisine Preferences:
+
+Revealed New Delhi as a major hub for Zomato transactions and provided an overview of top cuisine preferences.
